@@ -271,25 +271,6 @@ app.post("/api/check", async (_req, res) => {
   } catch (error) { res.status(500).json({ error: error.message }); }
 });
 
-// Lightweight proactive monitor: polls deterministic state only. Gemini is called
-// only if a milestone genuinely passes and the app has a new transition to narrate.
-app.post("/api/watch", async (_req, res) => {
-  try {
-    assertConfigured();
-    if (!activeWorkflowId) return res.status(400).json({ error: "Choose a demo workflow before monitoring work." });
-    const workflow = workflows[activeWorkflowId];
-    const milestone = workflow.milestones[currentMilestone];
-    if (!milestone) return res.json({ complete: true });
-    const verification = await verify(workflow, milestone);
-    if (verification.status !== "pass") return res.json({ changed: false, complete: false, verification, currentMilestone });
-    const narration = await narrate({ phase: "proactively confirm and transition", milestone, verification });
-    currentMilestone += 1;
-    const nextMilestone = workflow.milestones[currentMilestone];
-    const complete = currentMilestone === workflow.milestones.length;
-    res.json({ changed: true, passed: true, verification, workflow: workflowSummary(workflow), practice: practiceSummary(), practiceScore: complete ? practiceScore() : null, currentMilestone, nextMilestone: nextMilestone ? clientMilestone(workflow, nextMilestone) : null, complete, narration });
-  } catch (error) { res.status(500).json({ error: error.message }); }
-});
-
 app.post("/api/chat", async (req, res) => {
   try {
     assertConfigured();

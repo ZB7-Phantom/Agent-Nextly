@@ -33,7 +33,7 @@ Notion proves that live, state-based teaching works. Future integrations can tak
 1. Choose a guided Notion build or a tiered practice challenge.
 2. Nextly gives a compact next action and an explicit click-by-click guide.
 3. Build the step in your own shared Notion workspace — there is no simulated sandbox.
-4. Nextly checks the live Notion API state, either when you press **Check now** or through its lightweight polling monitor.
+4. When you press **Verify step**, Nextly checks the live Notion API state.
 5. If the state is incomplete, it explains the exact gap and why it matters.
 6. If the state passes, Nextly advances to the next milestone. Progress is earned, not self-reported.
 

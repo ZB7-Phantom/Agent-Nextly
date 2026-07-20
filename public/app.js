@@ -17,7 +17,6 @@ const sidebarToggle = document.querySelector("#sidebar-toggle");
 let workflows = [];
 let assignments = [];
 let active = null;
-let watcher = null;
 let requestInFlight = false;
 let lastGap = "";
 
@@ -60,7 +59,6 @@ function renderLesson(data) {
   badge.textContent = data.practice ? `${data.practice.level} practice · ${data.practice.title}` : "";
   document.querySelector("#scorecard").hidden = true;
   showMilestone(data.currentMilestone, data.milestone, data.narration);
-  startWatcher();
 }
 
 async function choosePractice(id) {
@@ -118,7 +116,6 @@ async function choose(id) {
 }
 
 function showCompleted(update) {
-  stopWatcher();
   document.querySelector("#progress").textContent = `${active.milestoneCount} OF ${active.milestoneCount} VERIFIED`;
   document.querySelector("#instruction").innerHTML = `<p class="card-kicker">WORKFLOW COMPLETE</p><h3>You built it.</h3><p>Your workspace passed every live verification checkpoint.</p>`;
   document.querySelector("#narration").textContent = update.narration;
@@ -158,32 +155,21 @@ async function checkNow() {
   if (!button.disabled) button.innerHTML = "Check now <span>→</span>";
 }
 
-async function watchWorkspace() {
-  if (requestInFlight || !active || button.disabled) return;
-  requestInFlight = true;
-  try {
-    const update = await request("/api/watch", { method: "POST" });
-    if (update.changed) applyPassingUpdate(update, "watch");
-    else if (!update.complete) {
-      const gap = `${update.verification.summary}|${update.verification.diff.missing.join("|")}`;
-      if (gap !== lastGap) {
-        lastGap = gap;
-        status.textContent = `Still watching: ${update.verification.diff.missing[0] || update.verification.summary}`;
-      }
-    }
-  } catch (error) { status.textContent = `Monitoring paused: ${error.message}`; }
-  requestInFlight = false;
-}
-
-function startWatcher() { stopWatcher(); watcher = setInterval(watchWorkspace, 7000); }
-function stopWatcher() { if (watcher) clearInterval(watcher); watcher = null; }
-
 button.addEventListener("click", checkNow);
 
-document.querySelector("#back").addEventListener("click", () => { stopWatcher(); tutor.hidden = true; picker.hidden = false; pickerStatus.textContent = "Use a clean shared Notion page before starting another workflow."; });
+document.addEventListener("keydown", (event) => {
+  if (!tutor.hidden && (event.metaKey || event.ctrlKey) && event.key === "Enter") {
+    event.preventDefault(); checkNow();
+  }
+  if (!tutor.hidden && (event.metaKey || event.ctrlKey) && event.key === "/") {
+    event.preventDefault(); chatInput.focus();
+  }
+});
+
+document.querySelector("#back").addEventListener("click", () => { tutor.hidden = true; picker.hidden = false; pickerStatus.textContent = "Use a clean shared Notion page before starting another workflow."; });
 
 document.querySelector("#new-lesson").addEventListener("click", () => {
-  stopWatcher(); tutor.hidden = true; picker.hidden = false; pickerStatus.textContent = ""; goalInput.focus();
+  tutor.hidden = true; picker.hidden = false; pickerStatus.textContent = ""; goalInput.focus();
 });
 
 sidebarToggle.addEventListener("click", () => {
