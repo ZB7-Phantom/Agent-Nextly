@@ -1,32 +1,135 @@
-# Nextly — Hackathon Demo
+# Nextly
 
-Nextly is a deliberately narrow OpenAI Build Week proof of concept for learning AI-native software through practice. It offers three guided Notion builds—habit tracker, project planner, and reading list—and advances only after deterministic checks against a live Notion workspace pass.
+**An AI practice tutor that teaches software by verifying what you actually built — not by trusting what you say you did.**
 
-## Golden path
+Nextly is a hackathon proof of concept for a different way to learn AI-native software: build a real outcome in the real tool, receive the next best instruction, and advance only when the workspace proves the step is complete.
 
-1. Select one workflow and create its specifically named inline database under the pre-shared Notion page.
-2. Follow the property and row steps shown in Nextly.
-3. Nextly polls the live workspace every seven seconds and automatically advances when a milestone passes. **Check now** remains available for the live demo catch-the-gap moment.
+The current demo uses Notion to prove the model. It includes guided builds and tiered practice challenges, but Notion is the first integration — not the product's limit.
 
-## Why the model cannot judge correctness
+## The problem
 
-`server.js` owns all advancement. It calls only hardcoded Notion endpoints and returns a structured pass/fail/partial diff. It first confirms that the integration can inspect a usable data source, so an inaccessible or linked database block cannot pass milestone 1. Gemini receives that diff only to produce a concise teaching explanation; the frontend advances only from `verification.status === "pass"`.
+Most software-learning experiences share the same blind spot:
 
-## Run it
+- **Courses, documentation, and videos** explain a workflow, but cannot see whether the learner applied it correctly.
+- **Recorded step guides** turn a path into instructions, but still rely on the learner to self-report completion.
+- **General AI chat** can give excellent guidance, but normally cannot distinguish “I finished it” from “I said I finished it.”
 
-1. In Notion, create an internal integration and manually share one empty parent page with it.
-2. Copy `.env.example` to `.env` and fill in the Notion token, the parent page ID, and a Gemini API key. The default model is `gemini-2.5-flash`.
-3. Install and run:
+That is a serious gap in software where work can look plausible but still be wrong: automations with branching logic, spreadsheet formulas, database relationships, or no-code app logic.
 
-   ```bash
-   npm install
-   npm start
-   ```
+**Nextly closes that gap with a teach → build → verify loop.** It guides the learner through a real task, reads structured state from the connected workspace, identifies the precise missing requirement, and unlocks progress only when the result is verified.
 
-4. Open `http://localhost:3000`, keep the shared Notion page visible beside it, and perform the golden path above.
+## Why Notion
 
-For a private repository, share access with `testing@devpost.com` and `build-week-event@openai.com` before submission. The `/feedback` Session ID for this Codex build thread should be included in the Devpost form.
+Notion is the cleanest environment to prove the mechanism:
 
-## Scope intentionally excluded
+- Its API exposes structured workspace state: child databases, property types, and database rows.
+- That state lets Nextly verify a real end result without relying on screenshots, OCR, or self-reporting.
+- The same pattern can extend to tools with inspectable APIs, including Airtable, Google Sheets, automation platforms, and no-code tools.
 
-No OAuth, user accounts, arbitrary goal parsing, general-purpose workflows, browser extension, or persistence. This is a small set of rehearsable templates demonstrating live state verification.
+Notion proves that live, state-based teaching works. Future integrations can take the model to tools where correctness is even harder to judge by eye.
+
+## How it works
+
+1. Choose a guided Notion build or a tiered practice challenge.
+2. Nextly gives a compact next action and an explicit click-by-click guide.
+3. Build the step in your own shared Notion workspace — there is no simulated sandbox.
+4. Nextly checks the live Notion API state, either when you press **Check now** or through its lightweight polling monitor.
+5. If the state is incomplete, it explains the exact gap and why it matters.
+6. If the state passes, Nextly advances to the next milestone. Progress is earned, not self-reported.
+
+## What the demo verifies
+
+The app currently supports three Notion builds:
+
+| Build | Verified outcome |
+| --- | --- |
+| Habit tracker | Inline `Habit Tracker` database, checkbox property, date property, and at least three rows |
+| Project planner | Inline `Project Planner` database, select property, date property, and at least three rows |
+| Reading list | Inline `Reading List` database, URL property, multi-select property, and at least three rows |
+
+It also includes a **Practice Lab** with Beginner, Intermediate, and Advanced assignments. At completion, the demo displays a score built from verified completion, checkpoint accuracy, and time/checkpoint efficiency.
+
+> **An honest limitation:** “Flow” in this demo measures verified checkpoint efficiency and elapsed practice time. It does not claim to see every click or detour inside Notion. Browser-level interaction telemetry is a future extension.
+
+## Why the AI does not decide correctness
+
+The LLM never decides whether a learner passed.
+
+`server.js` owns progression with deterministic JavaScript verifiers that query the Notion API:
+
+- `GET /v1/blocks/{page_id}/children` finds the relevant child database.
+- `GET /v1/databases/{id}` finds its accessible data source.
+- `GET /v1/data_sources/{id}` inspects property schema.
+- `POST /v1/data_sources/{id}/query` checks the row count.
+
+Every milestone returns a structured `pass`, `fail`, or `partial` result with evidence and missing requirements. Gemini only turns that verified result into concise, helpful coaching. It cannot advance the learner or invent workspace state.
+
+## Tech stack
+
+- Node.js + Express
+- Minimal single-page HTML, CSS, and JavaScript frontend
+- Notion REST API for live workspace verification
+- Google Gemini API for short instructional narration and learner Q&A
+- Deterministic, hard-coded verifier functions for trustworthy demo outcomes
+
+## Run locally
+
+### 1. Create and share a Notion integration
+
+Create an internal Notion integration, copy its secret, then share one empty parent page with that integration. Nextly can only inspect content beneath that shared page.
+
+### 2. Configure environment variables
+
+Copy the example file:
+
+```bash
+copy .env.example .env
+```
+
+Fill in `.env`:
+
+```env
+NOTION_TOKEN=secret_...
+NOTION_PARENT_PAGE_ID=...
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-2.5-flash
+```
+
+### 3. Install and start
+
+```bash
+npm install
+npm start
+```
+
+Then visit [http://localhost:3000](http://localhost:3000).
+
+## Demo script
+
+For the strongest judge-facing moment:
+
+1. Open a clean parent Notion page shared with the integration.
+2. In Nextly, start **Build a habit tracker in Notion**.
+3. Complete the database and checkbox milestones, then let Nextly verify them.
+4. On the date milestone, deliberately skip the date property and press **Check now**.
+5. Nextly identifies that specific missing schema requirement from the live API state.
+6. Add the date property, verify it, add three rows, and complete the path.
+7. Optionally repeat via a tiered Practice Lab challenge to show the verified scorecard.
+
+## Current scope
+
+This is intentionally a narrow hackathon demo. It does **not** include OAuth, user accounts, arbitrary goal parsing, persistent learner profiles, general-purpose templates, browser-extension monitoring, or recovery for off-script setups.
+
+Those constraints keep the central claim clear: **Nextly teaches by asking the learner to do the work, then verifying the real result.**
+
+## Roadmap
+
+- More software integrations where correctness is difficult to eyeball
+- Reusable goal and verification templates
+- Proactive in-product guidance through a browser extension
+- Richer mastery scoring based on real interaction data
+- Learner profiles and adaptive practice difficulty
+
+---
+
+Built for OpenAI Build Week with Codex. 
