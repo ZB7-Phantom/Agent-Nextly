@@ -71,3 +71,73 @@ body { background:#070707; color:#f3f1ed; }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; } }
 @media (max-width:1180px) { .lesson-layout { grid-template-columns:245px minmax(0,1fr); }.build-inspector { display:none; } }
 @media (max-width:800px) { .discover-view { padding:20px 20px 64px; }.hero-copy { padding-top:54px; }.lesson-panel { padding:30px 20px 56px; border-right:0; } }
+
+/* Responsive shell: full sidebar on desktop, compact rail on tight laptops,
+   and an explicit off-canvas navigation panel on phones. */
+.mobile-menu { display:none; place-items:center; width:34px; height:34px; border:1px solid #303030; border-radius:8px; background:#121212; color:#e6e6e6; cursor:pointer; font-size:17px; line-height:1; }
+.mobile-lesson-actions { display:flex; align-items:center; gap:13px; }
+.sidebar-collapsed .brand { display:none; }
+.sidebar-collapsed .brand-row { min-height:30px; justify-content:center; }
+.sidebar-collapsed .sidebar-toggle { position:static; transform:none; }
+
+@media (max-width:1280px) {
+  .discover-view { max-width:1040px; padding-inline:clamp(28px,4vw,52px); }
+  .lesson-layout { grid-template-columns:230px minmax(0,1fr); }
+  .lesson-sidebar { padding-inline:22px; }
+  .lesson-panel { padding-inline:clamp(28px,4vw,48px); }
+}
+
+@media (max-width:1060px) {
+  .app-frame { grid-template-columns:220px minmax(0,1fr); }
+  .app-sidebar { padding-inline:16px; }
+  .sidebar-bottom { gap:8px; }
+  .workflow-cards,.practice-cards { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .hero-copy h1 { font-size:clamp(2.7rem,7vw,4.7rem); }
+  .lesson-layout { grid-template-columns:205px minmax(0,1fr); }
+  .lesson-sidebar { padding:30px 18px; }
+  .lesson-sidebar h2 { font-size:1.55rem; }
+  .steps strong { font-size:.7rem; }
+}
+
+@media (max-width:880px) {
+  .discover-view { padding-inline:clamp(24px,5vw,44px); }
+  .lesson-layout { grid-template-columns:1fr; }
+  .lesson-sidebar { display:none; }
+  .lesson-panel { width:min(100%,780px); margin:0 auto; padding-inline:clamp(24px,5vw,42px); }
+}
+
+@media (max-width:720px) {
+  .app-frame,.app-frame.sidebar-collapsed { grid-template-columns:1fr; }
+  .app-sidebar { position:fixed; inset:0 auto 0 0; z-index:50; display:flex; width:min(86vw,320px); padding:19px; border-right:1px solid #303030; box-shadow:22px 0 50px #00000070; transform:translateX(-105%); transition:transform .28s cubic-bezier(.2,.8,.2,1); }
+  .app-frame.mobile-nav-open .app-sidebar { transform:translateX(0); }
+  .app-frame.mobile-nav-open::before { content:""; position:fixed; inset:0; z-index:45; background:#00000088; backdrop-filter:blur(2px); }
+  .app-sidebar .sidebar-copy,.app-sidebar .nav-label,.app-sidebar .integration small,.app-sidebar .integration i { width:auto; opacity:1; overflow:visible; transform:none; pointer-events:auto; }
+  .app-frame.sidebar-collapsed .app-sidebar .sidebar-copy,.app-frame.sidebar-collapsed .app-sidebar .nav-label,.app-frame.sidebar-collapsed .app-sidebar .integration small,.app-frame.sidebar-collapsed .app-sidebar .integration i { width:auto; opacity:1; overflow:visible; transform:none; pointer-events:auto; }
+  .app-sidebar .brand { display:flex; }
+  .app-frame.sidebar-collapsed .app-sidebar .brand { display:flex; }
+  .app-sidebar .brand-row { justify-content:space-between; }
+  .app-sidebar .sidebar-toggle { position:static; }
+  .app-sidebar .new-button { justify-content:center; font-size:inherit; padding-inline:12px; }
+  .app-sidebar .nav-item,.app-sidebar .integration { justify-content:flex-start; padding-inline:9px; }
+  .app-sidebar .sidebar-bottom { justify-content:flex-start; }
+  .mobile-menu { display:grid; }
+  .top-actions { justify-content:flex-end; }.top-actions .mobile-menu { margin-right:auto; }
+  .discover-view { padding:16px 18px 52px; }.hero-copy { padding-top:48px; }.hero-copy h1 { font-size:clamp(2.45rem,13vw,3.8rem); line-height:1.01; }.hero-copy p:last-child { font-size:.95rem; }
+  .goal-composer textarea { min-height:96px; padding:19px 18px 5px; }.composer-tools { align-items:flex-end; padding:10px; }.tool-group { flex-wrap:wrap; gap:6px; }
+  .section-heading { align-items:flex-start; flex-direction:column; gap:8px; }.section-heading>span { line-height:1.4; }
+  .workflow-cards,.practice-cards { grid-template-columns:1fr; }.workflow-card { min-height:175px; }.practice-card { min-height:164px; }
+  .future-section { align-items:flex-start; flex-direction:column; gap:12px; }.future-section div { flex-wrap:wrap; gap:10px 14px; }
+  .lesson-topbar { height:58px; padding:0 18px; }.lesson-connection span:not(.notion-icon) { display:none; }.lesson-panel { padding:25px 18px 48px; }.instruction-card { padding:23px 20px; }.guide-card,.chat-card { padding:18px; }.action-bar { gap:12px; }.action-bar>div { max-width:100%; }.check-button { width:100%; min-height:45px; }.scorecard dl { grid-template-columns:1fr 1fr 1fr; }.scorecard { padding:17px; }
+}
+
+@media (max-width:390px) {
+  .top-actions { padding-bottom:12px; }.hero-copy { padding-top:36px; }.hero-copy h1 { font-size:2.35rem; }.composer-tools button { width:36px; height:36px; }.notion-chip,.verify-chip { font-size:.68rem; }.lesson-panel { padding-inline:14px; }.guide-list li { grid-template-columns:24px 1fr; gap:7px; }.scorecard dl { grid-template-columns:1fr; }.scorecard dl div { border-left:0; border-top:1px solid #40302d; padding:8px 0 0; }
+}
+
+/* Consistent SVG icon treatment and a practice-specific assessment surface. */
+.icon-sprite { position:absolute; width:0; height:0; overflow:hidden; }
+.ui-icon { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; vertical-align:middle; }
+.nav-item .ui-icon { flex:0 0 auto; width:17px; height:17px; }.new-button .ui-icon { width:17px; height:17px; }.mobile-menu .ui-icon,.icon-button .ui-icon { width:17px; height:17px; }.back-button .ui-icon { width:15px; height:15px; margin-right:4px; }.composer-tools button .ui-icon { width:19px; height:19px; }.card-icon .ui-icon,.workflow-icon .ui-icon { width:17px; height:17px; }.card-start b .ui-icon,.practice-start b .ui-icon,.check-button span .ui-icon { width:14px; height:14px; }
+.card-start b,.practice-start b,.check-button span { display:inline-flex; align-items:center; }.check-button span { padding-left:5px; }
+.challenge-brief { margin:0 0 15px; padding:22px; border:1px solid #354274; border-radius:10px; background:#0d1220; animation:workspace-enter .32s ease both; }.challenge-top { display:flex; justify-content:space-between; gap:14px; align-items:flex-start; }.challenge-top h3 { margin:0; color:#f2f4ff; font:650 1.28rem/1.12 Inter,ui-sans-serif,system-ui,sans-serif; letter-spacing:-.04em; }.challenge-top>span { flex:0 0 auto; padding:5px 7px; border:1px solid #3c4b83; border-radius:5px; color:#c7d1ff; background:#151d35; font:700 9px/1 ui-monospace,monospace; letter-spacing:.08em; text-transform:uppercase; }.challenge-brief>p { margin:13px 0 0; color:#b8bfd7; font-size:.86rem; line-height:1.5; }.challenge-rubric { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:18px; }.challenge-rubric>div { min-height:74px; padding:11px; border:1px solid #29345d; border-radius:7px; background:#0a0f1c; }.challenge-rubric strong { display:block; color:#eef0ff; font-size:.74rem; }.challenge-rubric small { display:block; margin-top:6px; color:#949dbd; font-size:.68rem; line-height:1.35; }.challenge-brief .challenge-note { padding-top:12px; border-top:1px solid #28325a; color:#8895c9; font-size:.73rem; }.practice-mode .instruction-card { border-left-color:var(--signal-blue); }.practice-mode .verified-label { color:#cbd5ff; }.practice-mode .coach-card { border-top:1px solid #252e50; }.practice-mode .action-bar { border-top-color:#2d3967; }
+@media (max-width:720px) { .challenge-brief { padding:18px; }.challenge-rubric { grid-template-columns:1fr; }.challenge-rubric>div { min-height:0; }.challenge-top h3 { font-size:1.12rem; } }

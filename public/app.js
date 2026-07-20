@@ -14,11 +14,20 @@ const goalForm = document.querySelector("#goal-form");
 const goalInput = document.querySelector("#goal-input");
 const appFrame = document.querySelector(".app-frame");
 const sidebarToggle = document.querySelector("#sidebar-toggle");
+const mobileMenuButtons = document.querySelectorAll("[data-mobile-menu]");
 let workflows = [];
 let assignments = [];
 let active = null;
 let requestInFlight = false;
 let lastGap = "";
+
+function icon(name, className = "ui-icon") {
+  return `<svg class="${className}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
+}
+
+function workflowIcon(workflow) {
+  return icon(workflow.id === "habits" ? "check" : workflow.id === "projects" ? "list" : "book");
+}
 
 async function request(url, options) {
   const response = await fetch(url, options);
@@ -31,7 +40,7 @@ function renderCards() {
   cards.replaceChildren(...workflows.map((workflow) => {
     const card = document.createElement("button");
     card.type = "button"; card.className = "workflow-card";
-    card.innerHTML = `<span class="card-icon">${workflow.icon}</span><span class="card-copy"><small>NOTION BUILD</small><strong>${workflow.title}</strong><em>${workflow.description}</em><span class="card-start">Start build <b>→</b></span></span>`;
+    card.innerHTML = `<span class="card-icon">${workflowIcon(workflow)}</span><span class="card-copy"><small>NOTION BUILD</small><strong>${workflow.title}</strong><em>${workflow.description}</em><span class="card-start">Start build <b>${icon("arrow-right")}</b></span></span>`;
     card.addEventListener("click", () => choose(workflow.id));
     return card;
   }));
@@ -41,7 +50,7 @@ function renderPracticeCards() {
   practiceCards.replaceChildren(...assignments.map((assignment) => {
     const card = document.createElement("button");
     card.type = "button"; card.className = "practice-card";
-    card.innerHTML = `<span class="practice-level">${assignment.level}</span><strong>${assignment.title}</strong><p>${assignment.description}</p><span class="practice-start">Start challenge <b>→</b></span>`;
+    card.innerHTML = `<span class="practice-level">${assignment.level}</span><strong>${assignment.title}</strong><p>${assignment.description}</p><span class="practice-start">Start challenge <b>${icon("arrow-right")}</b></span>`;
     card.addEventListener("click", () => choosePractice(assignment.id));
     return card;
   }));
@@ -50,13 +59,21 @@ function renderPracticeCards() {
 function renderLesson(data) {
   active = data.workflow;
   picker.hidden = true; tutor.hidden = false;
-  document.querySelector("#workflow-icon").textContent = active.icon;
+  document.querySelector("#workflow-icon").innerHTML = workflowIcon(active);
   document.querySelector("#workflow-name").textContent = active.label;
   document.querySelector("#workflow-title").textContent = active.title;
   document.querySelector("#workflow-description").textContent = active.description;
   const badge = document.querySelector("#practice-badge");
   badge.hidden = !data.practice;
   badge.textContent = data.practice ? `${data.practice.level} practice · ${data.practice.title}` : "";
+  tutor.classList.toggle("practice-mode", Boolean(data.practice));
+  const brief = document.querySelector("#challenge-brief");
+  const guideCard = document.querySelector("#guide-card");
+  brief.hidden = !data.practice;
+  guideCard.hidden = Boolean(data.practice);
+  if (data.practice) {
+    brief.innerHTML = `<div class="challenge-top"><div><p class="card-kicker">PRACTICE BRIEF</p><h3>${data.practice.title}</h3></div><span>${data.practice.level}</span></div><p>${data.practice.description}</p><div class="challenge-rubric"><div><strong>Complete</strong><small>Finish every verified checkpoint.</small></div><div><strong>Accurate</strong><small>Fewer failed checks earn more points.</small></div><div><strong>Intentional</strong><small>Use Ask Nextly only when you need a hint.</small></div></div><p class="challenge-note">The click-by-click guide is hidden in Practice Lab. Build the outcome, then verify it.</p>`;
+  }
   document.querySelector("#scorecard").hidden = true;
   showMilestone(data.currentMilestone, data.milestone, data.narration);
 }
@@ -75,7 +92,7 @@ async function choosePractice(id) {
 
 function showMilestone(index, milestone, narration) {
   document.querySelector("#progress").textContent = `STEP ${index + 1} OF ${active.milestoneCount}`;
-  document.querySelector("#instruction").innerHTML = `<p class="card-kicker">YOUR NEXT MOVE</p><h3>${milestone.title}</h3><p>${milestone.instruction}</p>`;
+  document.querySelector("#instruction").innerHTML = `<p class="card-kicker">${tutor.classList.contains("practice-mode") ? "CHALLENGE CHECKPOINT" : "YOUR NEXT MOVE"}</p><h3>${milestone.title}</h3><p>${milestone.instruction}</p>`;
   document.querySelector("#narration").textContent = narration;
   const guideSteps = Array.isArray(milestone.guide) && milestone.guide.length
     ? milestone.guide
@@ -152,7 +169,7 @@ async function checkNow() {
     else status.textContent = "The workspace has a specific gap. Fix it in Notion, then check again.";
   } catch (error) { status.textContent = error.message; }
   requestInFlight = false;
-  if (!button.disabled) button.innerHTML = "Check now <span>→</span>";
+  if (!button.disabled) button.innerHTML = `Verify step <span>${icon("arrow-right")}</span>`;
 }
 
 button.addEventListener("click", checkNow);
@@ -178,6 +195,18 @@ sidebarToggle.addEventListener("click", () => {
   sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
   sidebarToggle.setAttribute("aria-label", collapsed ? "Expand sidebar" : "Collapse sidebar");
 });
+
+mobileMenuButtons.forEach((menuButton) => menuButton.addEventListener("click", () => {
+  const open = appFrame.classList.toggle("mobile-nav-open");
+  mobileMenuButtons.forEach((button) => button.setAttribute("aria-expanded", String(open)));
+}));
+
+document.querySelectorAll(".app-sidebar button").forEach((sidebarButton) => sidebarButton.addEventListener("click", () => {
+  if (window.matchMedia("(max-width: 720px)").matches) {
+    appFrame.classList.remove("mobile-nav-open");
+    mobileMenuButtons.forEach((button) => button.setAttribute("aria-expanded", "false"));
+  }
+}));
 
 goalForm.addEventListener("submit", (event) => {
   event.preventDefault();
