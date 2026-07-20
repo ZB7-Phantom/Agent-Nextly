@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nextly — Learn by building</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/overrides.css" />
+  </head>
+  <body>
+    <div class="app-frame">
+      <aside class="app-sidebar" id="app-sidebar">
+        <div class="sidebar-top">
+          <div class="brand-row"><a class="brand" href="/" aria-label="Nextly home"><span class="brand-mark">N</span><span class="sidebar-copy">Nextly</span></a><button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Collapse sidebar" aria-expanded="true">‹</button></div>
+          <button class="new-button" type="button" id="new-lesson"><span>＋</span> New lesson</button>
+          <nav class="main-nav" aria-label="Main navigation">
+            <button class="nav-item active" type="button"><span class="lucide">⌂</span> <span class="sidebar-copy">Practice lab</span></button>
+            <button class="nav-item" type="button" disabled><span class="lucide">◴</span> <span class="sidebar-copy">Your progress</span></button>
+            <button class="nav-item" type="button" disabled><span class="lucide">▱</span> <span class="sidebar-copy">Works lab</span></button>
+          </nav>
+          <p class="nav-label">PRODUCTIVITY</p>
+          <nav class="integration-nav" aria-label="Software integrations">
+            <button class="integration active" type="button"><span class="notion-icon">N</span><span class="sidebar-copy">Notion</span><i>LIVE</i></button>
+            <button class="integration" type="button" disabled><span class="app-dot docs-dot"></span><span class="sidebar-copy">Google Docs</span><small>soon</small></button>
+            <button class="integration" type="button" disabled><span class="app-dot slack-dot"></span><span class="sidebar-copy">Slack</span><small>soon</small></button>
+            <button class="integration" type="button" disabled><span class="app-dot airtable-dot"></span><span class="sidebar-copy">Airtable</span><small>soon</small></button>
+          </nav>
+          <p class="nav-label">DESIGN</p>
+          <nav class="integration-nav" aria-label="Design integrations"><button class="integration" type="button" disabled><span class="app-dot figma-dot"></span><span class="sidebar-copy">Figma</span><small>soon</small></button><button class="integration" type="button" disabled><span class="app-dot adobe-dot">A</span><span class="sidebar-copy">Adobe Creative Cloud</span><small>soon</small></button><button class="integration" type="button" disabled><span class="app-dot photoshop-dot">Ps</span><span class="sidebar-copy">Photoshop</span><small>soon</small></button><button class="integration" type="button" disabled><span class="app-dot corel-dot">C</span><span class="sidebar-copy">CorelDRAW</span><small>soon</small></button></nav>
+          <p class="nav-label">ANALYTICS</p>
+          <nav class="integration-nav" aria-label="Analytics integrations"><button class="integration" type="button" disabled><span class="app-dot excel-dot">X</span><span class="sidebar-copy">Excel</span><small>soon</small></button><button class="integration" type="button" disabled><span class="app-dot sheets-dot">S</span><span class="sidebar-copy">Google Sheets</span><small>soon</small></button><button class="integration" type="button" disabled><span class="app-dot tableau-dot">T</span><span class="sidebar-copy">Tableau</span><small>soon</small></button></nav>
+          <p class="nav-label">CODE</p>
+          <nav class="integration-nav" aria-label="Code integrations"><button class="integration" type="button" disabled><span class="app-dot vscode-dot">⌘</span><span class="sidebar-copy">VS Code</span><small>soon</small></button><button class="integration" type="button" disabled><span class="app-dot github-dot">◖</span><span class="sidebar-copy">GitHub</span><small>soon</small></button><button class="integration" type="button" disabled><span class="app-dot linear-dot"></span><span class="sidebar-copy">Linear</span><small>soon</small></button></nav>
+        </div>
+        <div class="sidebar-bottom"><span class="avatar">K</span><div class="sidebar-copy"><strong>Builder mode</strong><small>Notion connected</small></div><span class="more sidebar-copy">•••</span></div>
+      </aside>
+
+      <main class="app-main">
+        <section id="picker" class="discover-view">
+          <div class="top-actions"><span class="status-live"><i></i> Notion is connected</span><button class="icon-button" type="button" aria-label="Settings">⚙</button></div>
+          <div class="hero-copy"><p class="eyebrow">NEXTLY PRACTICE LAB</p><h1>What do you want to <em>build?</em></h1><p>Learn AI-native software in the real workspace. Nextly sees the outcome, guides the next move, and tracks the win.</p></div>
+          <form id="goal-form" class="goal-composer">
+            <textarea id="goal-input" rows="2" placeholder="Describe what you want to create in Notion…"></textarea>
+            <div class="composer-tools"><div class="tool-group"><span class="notion-chip"><span class="notion-icon">N</span> Notion <b>⌄</b></span><span class="monitor-chip"><i></i> Live monitoring</span></div><button type="submit" aria-label="Start a custom goal">↑</button></div>
+          </form>
+          <p id="picker-status" class="quiet" role="status"></p>
+          <section class="suggestion-section" aria-labelledby="suggestions-title"><div class="section-heading"><div><p class="eyebrow">START HERE</p><h2 id="suggestions-title">Notion suggestions</h2></div><span>Pick one to begin practicing</span></div><div id="workflow-cards" class="workflow-cards" aria-live="polite"></div></section>
+          <section class="practice-section" aria-labelledby="practice-title"><div class="section-heading"><div><p class="eyebrow">PROVE IT</p><h2 id="practice-title">Practice challenges</h2></div><span>Tiered, live-verified assignments</span></div><div id="practice-cards" class="practice-cards" aria-live="polite"></div></section>
+          <section class="future-section"><p>More software is on the way</p><div><span><b class="app-dot figma-dot"></b> Figma</span><span><b class="app-dot linear-dot"></b> Linear</span><span><b class="app-dot slack-dot"></b> Slack</span></div></section>
+        </section>
+
+        <section id="tutor" class="tutor-view" hidden>
+          <header class="lesson-topbar"><button id="back" class="back-button" type="button">← Notion suggestions</button><div class="lesson-connection"><span class="notion-icon">N</span><span>Notion workspace</span><i></i></div></header>
+          <div class="lesson-layout">
+            <aside class="lesson-sidebar"><div class="workflow-label"><span id="workflow-icon" class="workflow-icon"></span><span id="workflow-name"></span></div><h2 id="workflow-title"></h2><p id="workflow-description"></p><div class="trail-heading"><span>YOUR PATH</span><span id="trail-count"></span></div><ol id="steps" class="steps" aria-label="Workflow steps"></ol></aside>
+            <section class="lesson-panel"><div class="lesson-header"><p id="progress" class="eyebrow"></p><span class="verified-label">LIVE WORKSPACE</span></div><div id="practice-badge" class="practice-badge" hidden></div><article id="instruction" class="instruction-card"></article><section class="guide-card" aria-labelledby="guide-title"><div class="guide-top"><div><p class="card-kicker">SHOW ME HOW</p><h3 id="guide-title">Do this in Notion</h3></div><span class="guide-spark">✦</span></div><ol id="guide" class="guide-list"></ol></section><section class="coach-card"><div class="coach-avatar">N</div><div><p class="coach-label">NEXTLY</p><div id="narration" class="narration" aria-live="polite"></div></div></section><div id="feedback" class="feedback" aria-live="polite"></div><section id="scorecard" class="scorecard" hidden></section><div class="action-bar"><div><strong id="watch-label"><span class="pulse"></span> Monitoring your workspace</strong><p>Nextly will move you forward when the state is right.</p></div><button id="check" class="check-button" type="button">Check now <span>→</span></button></div><section class="chat-card" aria-labelledby="chat-title"><div><p class="card-kicker">ASK NEXTLY</p><h3 id="chat-title">Need a hand?</h3></div><div id="chat-messages" class="chat-messages" aria-live="polite"></div><form id="chat-form" class="chat-form"><input id="chat-input" maxlength="700" placeholder="Where do I find the property menu?" aria-label="Ask Nextly a question" /><button type="submit">Ask <span>↗</span></button></form></section><p id="status" class="quiet" role="status"></p></section>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>

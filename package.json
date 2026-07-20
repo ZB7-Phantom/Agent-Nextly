@@ -1,0 +1,15 @@
+{
+  "name": "notion-live-tutor-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenAI Build Week demo: deterministic Notion tutoring verification",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2"
+  }
+}
