@@ -2,7 +2,7 @@
 
 **An AI practice tutor that teaches software by verifying what you actually built — not by trusting what you say you did.**
 
-Nextly is a hackathon proof of concept for a different way to learn AI-native software: build a real outcome in the real tool, receive the next best instruction, and advance only when the workspace proves the step is complete.
+Nextly is a hackathon proof of concept for a different way to learn software: build a real outcome in the real tool, receive the next best instruction, and advance only when the workspace proves the step is complete.
 
 The current demo uses Notion to prove the model. It includes guided builds and tiered practice challenges, but Notion is the first integration — not the product's limit.
 

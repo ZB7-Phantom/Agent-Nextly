@@ -20,6 +20,7 @@
 .sidebar-collapsed .app-sidebar .integration-nav { gap:7px; }
 
 .integration-nav { margin-bottom:4px; }
+.software-finder { display:grid; gap:7px; margin:12px 0 18px; }.software-search { display:flex; align-items:center; gap:7px; padding:8px 9px; border:1px solid #303030; border-radius:7px; background:#111; color:#929292; }.software-search>span { font-size:16px; line-height:1; }.software-search input,.software-finder select { width:100%; border:0; outline:0; color:#e7e7e7; background:transparent; font-size:11px; }.software-finder select { appearance:auto; padding:7px 8px; border:1px solid #303030; border-radius:7px; background:#111; color:#bdbdbd; }.software-finder select:focus,.software-search:focus-within { border-color:var(--signal-blue); }.software-finder p { margin:0; color:#9c9c9c; font-size:10px; }
 .integration { min-height:34px; }
 .adobe-dot,.photoshop-dot,.corel-dot,.excel-dot,.sheets-dot,.tableau-dot,.vscode-dot,.github-dot { display:grid; place-items:center; color:white; font:700 .56rem "DM Mono",monospace; }
 .adobe-dot { background:#ed2224; }.photoshop-dot { background:#001e36; color:#31a8ff; }.corel-dot { background:#67b146; }.excel-dot { background:#217346; }.sheets-dot { background:#34a853; }.tableau-dot { background:#e97627; }.vscode-dot { background:#007acc; }.github-dot { background:#ececec; color:#121212; }
@@ -77,6 +78,7 @@ body { background:#070707; color:#f3f1ed; }
 .mobile-menu { display:none; place-items:center; width:34px; height:34px; border:1px solid #303030; border-radius:8px; background:#121212; color:#e6e6e6; cursor:pointer; font-size:17px; line-height:1; }
 .mobile-lesson-actions { display:flex; align-items:center; gap:13px; }
 .sidebar-collapsed .brand { display:none; }
+.sidebar-collapsed .software-finder { display:none; }
 .sidebar-collapsed .brand-row { min-height:30px; justify-content:center; }
 .sidebar-collapsed .sidebar-toggle { position:static; transform:none; }
 
@@ -115,6 +117,7 @@ body { background:#070707; color:#f3f1ed; }
   .app-frame.sidebar-collapsed .app-sidebar .sidebar-copy,.app-frame.sidebar-collapsed .app-sidebar .nav-label,.app-frame.sidebar-collapsed .app-sidebar .integration small,.app-frame.sidebar-collapsed .app-sidebar .integration i { width:auto; opacity:1; overflow:visible; transform:none; pointer-events:auto; }
   .app-sidebar .brand { display:flex; }
   .app-frame.sidebar-collapsed .app-sidebar .brand { display:flex; }
+  .app-frame.sidebar-collapsed .software-finder { display:grid; }
   .app-sidebar .brand-row { justify-content:space-between; }
   .app-sidebar .sidebar-toggle { position:static; }
   .app-sidebar .new-button { justify-content:center; font-size:inherit; padding-inline:12px; }

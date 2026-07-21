@@ -17,6 +17,9 @@ const goalInput = document.querySelector("#goal-input");
 const appFrame = document.querySelector(".app-frame");
 const sidebarToggle = document.querySelector("#sidebar-toggle");
 const mobileMenuButtons = document.querySelectorAll("[data-mobile-menu]");
+const softwareSearch = document.querySelector("#software-search");
+const softwareFilter = document.querySelector("#software-filter");
+const softwareEmpty = document.querySelector("#software-empty");
 const navButtons = { practice: document.querySelector("#nav-practice"), progress: document.querySelector("#nav-progress"), works: document.querySelector("#nav-works") };
 let workflows = [];
 let assignments = [];
@@ -268,6 +271,28 @@ document.querySelectorAll(".app-sidebar button").forEach((sidebarButton) => side
     mobileMenuButtons.forEach((button) => button.setAttribute("aria-expanded", "false"));
   }
 }));
+
+function filterSoftware() {
+  const query = softwareSearch.value.trim().toLowerCase();
+  const category = softwareFilter.value;
+  let visibleCount = 0;
+  document.querySelectorAll(".integration-nav[data-category]").forEach((group) => {
+    const categoryMatch = category === "all" || group.dataset.category === category;
+    let groupVisible = 0;
+    group.querySelectorAll(".integration").forEach((item) => {
+      const matches = categoryMatch && item.textContent.toLowerCase().includes(query);
+      item.hidden = !matches;
+      if (matches) { visibleCount += 1; groupVisible += 1; }
+    });
+    group.hidden = groupVisible === 0;
+    const label = group.previousElementSibling;
+    if (label?.classList.contains("nav-label")) label.hidden = groupVisible === 0;
+  });
+  softwareEmpty.hidden = visibleCount !== 0;
+}
+
+softwareSearch.addEventListener("input", filterSoftware);
+softwareFilter.addEventListener("change", filterSoftware);
 
 goalForm.addEventListener("submit", (event) => {
   event.preventDefault();
