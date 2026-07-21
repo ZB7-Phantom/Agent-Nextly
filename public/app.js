@@ -192,6 +192,7 @@ function applyPassingUpdate(update, source) {
 async function checkNow() {
   if (requestInFlight) return;
   requestInFlight = true;
+  let workflowComplete = false;
   button.disabled = true; button.innerHTML = "Checking workspace…"; status.textContent = "Reading the live Notion state…";
   try {
     const update = await request("/api/check", { method: "POST" });
@@ -199,12 +200,17 @@ async function checkNow() {
     note.className = `result ${update.passed ? "pass" : "gap"}`;
     note.innerHTML = `<strong>${update.passed ? "Verified in Notion" : "One thing to fix"}</strong><p>${update.narration}</p>`;
     feedback.replaceChildren(note);
-    if (update.complete) { showCompleted(update); return; }
+    if (update.complete) { workflowComplete = true; showCompleted(update); return; }
     if (update.passed) applyPassingUpdate(update, "manual");
     else status.textContent = "The workspace has a specific gap. Fix it in Notion, then check again.";
   } catch (error) { status.textContent = error.message; }
-  requestInFlight = false;
-  if (!button.disabled) button.innerHTML = `Verify step <span>${icon("arrow-right")}</span>`;
+  finally {
+    requestInFlight = false;
+    if (!workflowComplete) {
+      button.disabled = false;
+      button.innerHTML = `Verify step <span>${icon("arrow-right")}</span>`;
+    }
+  }
 }
 
 button.addEventListener("click", checkNow);
