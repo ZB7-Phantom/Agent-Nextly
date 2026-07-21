@@ -58,6 +58,7 @@ let activePractice = null;
 let practiceStartedAt = null;
 let manualChecks = 0;
 let failedChecks = 0;
+let cachedDatabase = null;
 
 function assertConfigured() {
   const missing = [
@@ -87,6 +88,10 @@ function plainText(richText = []) {
 }
 
 async function findDatabase(workflow) {
+  // After the first verified lookup, later milestones already know which data
+  // source belongs to this single-session demo. This avoids re-listing blocks
+  // and re-fetching the database before every check.
+  if (cachedDatabase?.workflowId === workflow.id) return cachedDatabase.database;
   const children = await notion(`/v1/blocks/${config.parentPageId}/children?page_size=100`);
   const databaseBlocks = children.results.filter((block) => block.type === "child_database");
   if (!databaseBlocks.length) return null;
@@ -100,7 +105,9 @@ async function findDatabase(workflow) {
       const dataSource = database.data_sources?.[0];
       const title = plainText(database.title);
       if (dataSource && title.toLowerCase() === workflow.databaseTitle.toLowerCase()) {
-        return { id: databaseBlock.id, dataSourceId: dataSource.id, block: databaseBlock, title };
+        const found = { id: databaseBlock.id, dataSourceId: dataSource.id, block: databaseBlock, title };
+        cachedDatabase = { workflowId: workflow.id, database: found };
+        return found;
       }
       if (dataSource) issues.push(`Found “${title || "Untitled"}”, not the expected “${workflow.databaseTitle}”.`);
       else issues.push(`Database ${databaseBlock.id}: no accessible data source was returned.`);
@@ -109,6 +116,12 @@ async function findDatabase(workflow) {
     }
   }
   return { id: databaseBlocks[0].id, block: databaseBlocks[0], unavailable: true, reason: issues.join(" ") };
+}
+
+function quickNarration({ milestone, verification, passed }) {
+  if (passed) return `Verified: ${verification.summary}`;
+  const gap = verification.diff?.missing?.[0] || verification.summary;
+  return `Not verified yet: ${gap}`;
 }
 
 function result(status, summary, missing = [], evidence = {}) {
@@ -219,6 +232,7 @@ app.post("/api/workflows/:workflowId/start", async (req, res) => {
     if (!workflow) return res.status(404).json({ error: "That demo workflow does not exist." });
     activeWorkflowId = workflow.id;
     currentMilestone = 0;
+    cachedDatabase = null;
     activePractice = null; practiceStartedAt = null; manualChecks = 0; failedChecks = 0;
     const milestone = workflow.milestones[currentMilestone];
     const narration = await narrate({ phase: "introduce the first task", milestone });
@@ -233,6 +247,7 @@ app.post("/api/practice/:assignmentId/start", async (req, res) => {
     if (!assignment) return res.status(404).json({ error: "That practice assignment does not exist." });
     const workflow = workflows[assignment.workflowId];
     activeWorkflowId = workflow.id; currentMilestone = 0; activePractice = assignment.id;
+    cachedDatabase = null;
     practiceStartedAt = Date.now(); manualChecks = 0; failedChecks = 0;
     const milestone = workflow.milestones[currentMilestone];
     const narration = await narrate({ phase: `start ${assignment.level.toLowerCase()} practice`, milestone });
@@ -263,7 +278,9 @@ app.post("/api/check", async (_req, res) => {
     const verification = await verify(workflow, milestone);
     const passed = verification.status === "pass";
     if (activePractice && !passed) failedChecks += 1;
-    const narration = await narrate({ phase: passed ? "confirm and transition" : "teach the specific gap", milestone, verification });
+    // The check path is intentionally LLM-free: it returns immediately after
+    // deterministic API verification instead of waiting for a model response.
+    const narration = quickNarration({ milestone, verification, passed });
     if (passed) currentMilestone += 1;
     const nextMilestone = workflow.milestones[currentMilestone];
     const complete = currentMilestone === workflow.milestones.length;
