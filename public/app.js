@@ -1,5 +1,7 @@
 const picker = document.querySelector("#picker");
 const tutor = document.querySelector("#tutor");
+const progressView = document.querySelector("#progress-view");
+const worksView = document.querySelector("#works-view");
 const cards = document.querySelector("#workflow-cards");
 const practiceCards = document.querySelector("#practice-cards");
 const pickerStatus = document.querySelector("#picker-status");
@@ -15,11 +17,37 @@ const goalInput = document.querySelector("#goal-input");
 const appFrame = document.querySelector(".app-frame");
 const sidebarToggle = document.querySelector("#sidebar-toggle");
 const mobileMenuButtons = document.querySelectorAll("[data-mobile-menu]");
+const navButtons = { practice: document.querySelector("#nav-practice"), progress: document.querySelector("#nav-progress"), works: document.querySelector("#nav-works") };
 let workflows = [];
 let assignments = [];
 let active = null;
+let activePractice = null;
 let requestInFlight = false;
 let lastGap = "";
+
+const fallbackAssignments = [
+  { id: "daily-check-in", workflowId: "habits", level: "Beginner", title: "Build a daily check-in", description: "Create a habit tracker with a completion field, a date, and three real habits." },
+  { id: "launch-plan", workflowId: "projects", level: "Intermediate", title: "Plan a small launch", description: "Build a project board with status, deadlines, and three concrete tasks." },
+  { id: "research-library", workflowId: "reading", level: "Advanced", title: "Build a research library", description: "Organize sources with links, topics, and three items worth revisiting." },
+];
+
+function profile() { return JSON.parse(localStorage.getItem("nextly-demo-profile") || '{"works":[]}'); }
+function saveProfile(data) { localStorage.setItem("nextly-demo-profile", JSON.stringify(data)); }
+function recordWork(update) {
+  const data = profile();
+  const existing = data.works.findIndex((work) => work.id === active.id);
+  const work = { id: active.id, title: active.title, label: active.label, practice: Boolean(activePractice), score: update.practiceScore?.total || null, completedAt: new Date().toISOString() };
+  if (existing >= 0) data.works[existing] = work; else data.works.unshift(work);
+  saveProfile(data);
+}
+
+function showLab(view) {
+  picker.hidden = view !== "practice"; tutor.hidden = true; progressView.hidden = view !== "progress"; worksView.hidden = view !== "works";
+  Object.entries(navButtons).forEach(([name, button]) => button.classList.toggle("active", name === view));
+  if (view === "practice") { cards.querySelectorAll("button").forEach((card) => card.disabled = false); practiceCards.querySelectorAll("button").forEach((card) => card.disabled = false); }
+  if (view === "progress") renderProgress();
+  if (view === "works") renderWorks();
+}
 
 function icon(name, className = "ui-icon") {
   return `<svg class="${className}" aria-hidden="true"><use href="#i-${name}"/></svg>`;
@@ -58,7 +86,9 @@ function renderPracticeCards() {
 
 function renderLesson(data) {
   active = data.workflow;
-  picker.hidden = true; tutor.hidden = false;
+  activePractice = data.practice || null;
+  picker.hidden = true; progressView.hidden = true; worksView.hidden = true; tutor.hidden = false;
+  Object.entries(navButtons).forEach(([name, button]) => button.classList.toggle("active", name === "practice"));
   document.querySelector("#workflow-icon").innerHTML = workflowIcon(active);
   document.querySelector("#workflow-name").textContent = active.label;
   document.querySelector("#workflow-title").textContent = active.title;
@@ -82,7 +112,11 @@ async function choosePractice(id) {
   try {
     pickerStatus.textContent = "Loading your live challenge…";
     practiceCards.querySelectorAll("button").forEach((card) => card.disabled = true);
-    renderLesson(await request(`/api/practice/${id}/start`, { method: "POST" }));
+    const assignment = assignments.find((item) => item.id === id);
+    let data;
+    try { data = await request(`/api/practice/${id}/start`, { method: "POST" }); }
+    catch { data = await request(`/api/workflows/${assignment.workflowId}/start`, { method: "POST" }); data.practice = assignment; }
+    renderLesson(data);
     status.textContent = "Complete each checkpoint in Notion. Your practice score appears at the end.";
   } catch (error) {
     pickerStatus.textContent = error.message;
@@ -133,6 +167,7 @@ async function choose(id) {
 }
 
 function showCompleted(update) {
+  recordWork(update);
   document.querySelector("#progress").textContent = `${active.milestoneCount} OF ${active.milestoneCount} VERIFIED`;
   document.querySelector("#instruction").innerHTML = `<p class="card-kicker">WORKFLOW COMPLETE</p><h3>You built it.</h3><p>Your workspace passed every live verification checkpoint.</p>`;
   document.querySelector("#narration").textContent = update.narration;
@@ -183,11 +218,31 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-document.querySelector("#back").addEventListener("click", () => { tutor.hidden = true; picker.hidden = false; pickerStatus.textContent = "Use a clean shared Notion page before starting another workflow."; });
+document.querySelector("#back").addEventListener("click", () => { showLab("practice"); pickerStatus.textContent = "Use a clean shared Notion page before starting another workflow."; });
 
 document.querySelector("#new-lesson").addEventListener("click", () => {
-  tutor.hidden = true; picker.hidden = false; pickerStatus.textContent = ""; goalInput.focus();
+  showLab("practice"); pickerStatus.textContent = ""; goalInput.focus();
 });
+
+navButtons.practice.addEventListener("click", () => showLab("practice"));
+navButtons.progress.addEventListener("click", () => showLab("progress"));
+navButtons.works.addEventListener("click", () => showLab("works"));
+document.querySelectorAll("[data-lab-back]").forEach((button) => button.addEventListener("click", () => showLab("practice")));
+
+function renderProgress() {
+  const works = profile().works;
+  const practiceScores = works.filter((work) => work.score).map((work) => work.score);
+  const average = practiceScores.length ? Math.round(practiceScores.reduce((sum, score) => sum + score, 0) / practiceScores.length) : "—";
+  document.querySelector("#progress-metrics").innerHTML = `<article><span>Verified builds</span><strong>${works.length}</strong><small>Real workspace outcomes</small></article><article><span>Practice score</span><strong>${average}</strong><small>${practiceScores.length ? "Average verified score" : "Complete a challenge to score"}</small></article><article><span>Current level</span><strong>${works.length >= 3 ? "Fluent" : works.length ? "Builder" : "Explorer"}</strong><small>Notion mastery path</small></article>`;
+}
+
+function renderWorks() {
+  const works = profile().works;
+  const grid = document.querySelector("#works-grid");
+  const source = works.length ? works : workflows.map((workflow) => ({ ...workflow, empty: true }));
+  grid.innerHTML = source.map((work) => `<article class="work-card ${work.empty ? "template" : ""}"><div class="work-card-icon">${workflowIcon(work)}</div><p>${work.empty ? "READY TO BUILD" : work.practice ? "PRACTICE COMPLETE" : "VERIFIED BUILD"}</p><h3>${work.title}</h3><span>${work.empty ? "Start a new verified build" : work.score ? `${work.score}/100 practice score` : "Workspace checkpoint complete"}</span><button type="button" data-workflow="${work.id}">${work.empty ? "Start build" : "Build again"} ${icon("arrow-right")}</button></article>`).join("");
+  grid.querySelectorAll("[data-workflow]").forEach((button) => button.addEventListener("click", () => choose(button.dataset.workflow)));
+}
 
 sidebarToggle.addEventListener("click", () => {
   const collapsed = appFrame.classList.toggle("sidebar-collapsed");
@@ -240,7 +295,8 @@ chatForm.addEventListener("submit", async (event) => {
 
 async function boot() {
   try {
-    [workflows, assignments] = await Promise.all([request("/api/workflows").then((data) => data.workflows), request("/api/practice").then((data) => data.assignments)]);
+    workflows = (await request("/api/workflows")).workflows;
+    try { assignments = (await request("/api/practice")).assignments; } catch { assignments = fallbackAssignments; }
     renderCards(); renderPracticeCards();
     const state = await request("/api/state");
     if (state.selected && !state.complete) renderLesson(state);

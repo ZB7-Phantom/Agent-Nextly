@@ -15,9 +15,9 @@
           <div class="brand-row"><a class="brand" href="/" aria-label="Nextly home"><span class="brand-mark">N</span><span class="sidebar-copy">Nextly</span></a><button id="sidebar-toggle" class="sidebar-toggle" type="button" aria-label="Collapse sidebar" aria-expanded="true">‹</button></div>
           <button class="new-button" type="button" id="new-lesson"><svg class="ui-icon"><use href="#i-plus"/></svg> New lesson</button>
           <nav class="main-nav" aria-label="Main navigation">
-            <button class="nav-item active" type="button"><svg class="ui-icon"><use href="#i-home"/></svg><span class="sidebar-copy">Practice lab</span></button>
-            <button class="nav-item" type="button" disabled><svg class="ui-icon"><use href="#i-chart"/></svg><span class="sidebar-copy">Your progress</span></button>
-            <button class="nav-item" type="button" disabled><svg class="ui-icon"><use href="#i-layers"/></svg><span class="sidebar-copy">Works lab</span></button>
+            <button id="nav-practice" class="nav-item active" type="button"><svg class="ui-icon"><use href="#i-home"/></svg><span class="sidebar-copy">Practice lab</span></button>
+            <button id="nav-progress" class="nav-item" type="button"><svg class="ui-icon"><use href="#i-chart"/></svg><span class="sidebar-copy">Your progress</span></button>
+            <button id="nav-works" class="nav-item" type="button"><svg class="ui-icon"><use href="#i-layers"/></svg><span class="sidebar-copy">Works lab</span></button>
           </nav>
           <p class="nav-label">PRODUCTIVITY</p>
           <nav class="integration-nav" aria-label="Software integrations">
@@ -45,10 +45,14 @@
             <div class="composer-tools"><div class="tool-group"><span class="notion-chip"><span class="notion-icon">N</span> Notion <b>⌄</b></span><span class="verify-chip"><i></i> Ready to verify</span></div><button type="submit" aria-label="Start a custom goal"><svg class="ui-icon"><use href="#i-arrow-up"/></svg></button></div>
           </form>
           <p id="picker-status" class="quiet" role="status"></p>
-          <section class="suggestion-section" aria-labelledby="suggestions-title"><div class="section-heading"><div><p class="eyebrow">START HERE</p><h2 id="suggestions-title">Notion suggestions</h2></div><span>Pick one to begin practicing</span></div><div id="workflow-cards" class="workflow-cards" aria-live="polite"></div></section>
+          <section class="suggestion-section" aria-labelledby="suggestions-title"><div class="section-heading"><div><p class="eyebrow">YOUR LEARNING MAP</p><h2 id="suggestions-title">Build your first system</h2></div><span>Choose a starting node</span></div><div class="roadmap-canvas"><div class="canvas-caption"><i></i> Notion learning path <span>drag to explore</span></div><span class="roadmap-link link-one"></span><span class="roadmap-link link-two"></span><div id="workflow-cards" class="workflow-cards roadmap-nodes" aria-live="polite"></div><div class="canvas-controls"><button type="button" aria-label="Zoom out">−</button><button type="button" aria-label="Zoom in">+</button></div></div></section>
           <section class="practice-section" aria-labelledby="practice-title"><div class="section-heading"><div><p class="eyebrow">PROVE IT</p><h2 id="practice-title">Practice challenges</h2></div><span>Tiered, live-verified assignments</span></div><div id="practice-cards" class="practice-cards" aria-live="polite"></div></section>
           <section class="future-section"><p>More software is on the way</p><div><span><b class="app-dot figma-dot"></b> Figma</span><span><b class="app-dot linear-dot"></b> Linear</span><span><b class="app-dot slack-dot"></b> Slack</span></div></section>
         </section>
+
+        <section id="progress-view" class="lab-view" hidden><div class="lab-topbar"><p class="eyebrow">YOUR PROGRESS</p><button class="lab-back" data-lab-back type="button">← Back to Practice Lab</button></div><div class="lab-heading"><h1>Proof of <em>practice.</em></h1><p>Every result here is earned through a verified workspace checkpoint.</p></div><div id="progress-metrics" class="progress-metrics"></div><section class="progress-path"><div class="section-heading"><div><p class="eyebrow">MASTERY PATH</p><h2>Your next level</h2></div><span>Notion · first integration</span></div><div class="mastery-map"><div class="mastery-node done"><span>01</span><strong>Foundation</strong><small>Build one verified workspace</small></div><i></i><div class="mastery-node active"><span>02</span><strong>Practice</strong><small>Complete a scored assignment</small></div><i></i><div class="mastery-node"><span>03</span><strong>Fluency</strong><small>Unlocks after three builds</small></div></div></section></section>
+
+        <section id="works-view" class="lab-view" hidden><div class="lab-topbar"><p class="eyebrow">WORKS LAB</p><button class="lab-back" data-lab-back type="button">← Back to Practice Lab</button></div><div class="lab-heading"><h1>Things you’ve <em>built.</em></h1><p>Reopen a build, repeat a challenge, or start a fresh verified workspace.</p></div><div id="works-grid" class="works-grid"></div></section>
 
         <section id="tutor" class="tutor-view" hidden>
           <header class="lesson-topbar"><div class="mobile-lesson-actions"><button class="mobile-menu" data-mobile-menu type="button" aria-label="Open navigation" aria-expanded="false"><svg class="ui-icon"><use href="#i-menu"/></svg></button><button id="back" class="back-button" type="button"><svg class="ui-icon"><use href="#i-arrow-left"/></svg> Notion suggestions</button></div><div class="lesson-connection"><span class="notion-icon">N</span><span>Notion workspace</span><i></i></div></header>
